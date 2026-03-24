@@ -328,7 +328,7 @@
   </div>
 
   <script>
-    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights';
+    const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
 
     // DOM 참조
     const dropZone     = document.getElementById('drop-zone');
@@ -352,10 +352,10 @@
     // ──────────────────────────────────────────
     async function loadModels() {
       try {
-        setStatus('loading', 'AI 모델을 불러오는 중... (최초 1회, 약 10~20 MB)');
+        setStatus('loading', 'AI 모델을 불러오는 중... (최초 1회, 약 3~5 MB)');
         await Promise.all([
-          faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
-          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
         ]);
         modelsLoaded = true;
         setStatus('ready', '모델 준비 완료 — 이미지를 올려주세요');
@@ -437,8 +437,8 @@
 
         // 얼굴 감지 + 랜드마크
         const detections = await faceapi
-          .detectAllFaces(originalImage, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.4 }))
-          .withFaceLandmarks();
+          .detectAllFaces(originalImage, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.4 }))
+          .withFaceLandmarks(true); // true = tiny landmark model
 
         if (detections.length === 0) {
           resultInfo.textContent = '⚠️ 얼굴을 감지하지 못했습니다. 다른 이미지를 시도해 보세요.';
